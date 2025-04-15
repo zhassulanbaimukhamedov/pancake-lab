@@ -13,9 +13,19 @@ public class PancakeService {
     private List<PancakeRecipe> pancakes        = new ArrayList<>();
 
     public Order createOrder(int building, int room) {
+        if (building <= 0 || room <= 0) {
+            throw new IllegalArgumentException("Building and room must be greater than 0.");
+        }
         Order order = new Order(building, room);
         orders.add(order);
         return order;
+    }
+
+    private Order findOrder(UUID orderId) {
+        return orders.stream()
+                .filter(o -> o.getId().equals(orderId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Order not found: " + orderId));
     }
 
     public List<String> viewOrder(UUID orderId) {
@@ -39,12 +49,12 @@ public class PancakeService {
                    removedCount.getAndIncrement() < count;
         });
 
-        Order order = orders.stream().filter(o -> o.getId().equals(orderId)).findFirst().get();
+        Order order = findOrder(orderId);
         OrderLog.logRemovePancakes(order, description, removedCount.get(), pancakes);
     }
 
     public void cancelOrder(UUID orderId) {
-        Order order = orders.stream().filter(o -> o.getId().equals(orderId)).findFirst().get();
+        Order order = findOrder(orderId);
         OrderLog.logCancelOrder(order, this.pancakes);
 
         pancakes.removeIf(pancake -> pancake.getOrderId().equals(orderId));
@@ -73,9 +83,11 @@ public class PancakeService {
     }
 
     public Object[] deliverOrder(UUID orderId) {
-        if (!preparedOrders.contains(orderId)) return null;
+        if (!preparedOrders.contains(orderId)) {
+            throw new IllegalStateException("Order is not prepared and cannot be delivered.");
+        }
 
-        Order order = orders.stream().filter(o -> o.getId().equals(orderId)).findFirst().get();
+        Order order = findOrder(orderId);
         List<String> pancakesToDeliver = viewOrder(orderId);
         OrderLog.logDeliverOrder(order, this.pancakes);
 
