@@ -7,10 +7,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PancakeService {
-    private List<Order>         orders          = new ArrayList<>();
-    private Set<UUID>           completedOrders = new HashSet<>();
-    private Set<UUID>           preparedOrders  = new HashSet<>();
-    private List<PancakeRecipe> pancakes        = new ArrayList<>();
+    private final List<Order>         orders          = Collections.synchronizedList(new ArrayList<>());
+    private final Set<UUID>           completedOrders = Collections.synchronizedSet(new HashSet<>());
+    private final Set<UUID>           preparedOrders  = Collections.synchronizedSet(new HashSet<>());
+    private final List<PancakeRecipe> pancakes        = Collections.synchronizedList(new ArrayList<>());
 
     public Order createOrder(int building, int room) {
         if (building <= 0 || room <= 0) {
@@ -41,7 +41,7 @@ public class PancakeService {
     }
 
 
-    public void removePancakes(String description, UUID orderId, int count) {
+    public synchronized void removePancakes(String description, UUID orderId, int count) {
         final AtomicInteger removedCount = new AtomicInteger(0);
         pancakes.removeIf(pancake -> {
             return pancake.getOrderId().equals(orderId) &&
@@ -53,7 +53,7 @@ public class PancakeService {
         OrderLog.logRemovePancakes(order, description, removedCount.get(), pancakes);
     }
 
-    public void cancelOrder(UUID orderId) {
+    public synchronized void cancelOrder(UUID orderId) {
         Order order = findOrder(orderId);
         OrderLog.logCancelOrder(order, this.pancakes);
 
@@ -65,7 +65,7 @@ public class PancakeService {
         OrderLog.logCancelOrder(order,pancakes);
     }
 
-    public void completeOrder(UUID orderId) {
+    public synchronized void completeOrder(UUID orderId) {
         completedOrders.add(orderId);
     }
 
@@ -73,7 +73,7 @@ public class PancakeService {
         return completedOrders;
     }
 
-    public void prepareOrder(UUID orderId) {
+    public synchronized void prepareOrder(UUID orderId) {
         preparedOrders.add(orderId);
         completedOrders.removeIf(u -> u.equals(orderId));
     }
@@ -82,7 +82,7 @@ public class PancakeService {
         return preparedOrders;
     }
 
-    public Object[] deliverOrder(UUID orderId) {
+    public synchronized Object[] deliverOrder(UUID orderId) {
         if (!preparedOrders.contains(orderId)) {
             throw new IllegalStateException("Order is not prepared and cannot be delivered.");
         }
