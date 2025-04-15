@@ -18,53 +18,18 @@ public class PancakeService {
         return order;
     }
 
-    public void addDarkChocolatePancake(UUID orderId, int count) {
-        for (int i = 0; i < count; ++i) {
-            addPancake(new DarkChocolatePancake(),
-                       orders.stream().filter(o -> o.getId().equals(orderId)).findFirst().get());
-        }
-    }
-
-    public void addDarkChocolateWhippedCreamPancake(UUID orderId, int count) {
-        for (int i = 0; i < count; ++i) {
-            addPancake(new DarkChocolateWhippedCreamPancake(),
-                       orders.stream().filter(o -> o.getId().equals(orderId)).findFirst().get());
-        }
-    }
-
-    public void addDarkChocolateWhippedCreamHazelnutsPancake(UUID orderId, int count) {
-        for (int i = 0; i < count; ++i) {
-            addPancake(new DarkChocolateWhippedCreamHazelnutsPancake(),
-                       orders.stream().filter(o -> o.getId().equals(orderId)).findFirst().get());
-        }
-    }
-
-    public void addMilkChocolatePancake(UUID orderId, int count) {
-        for (int i = 0; i < count; ++i) {
-            addPancake(new MilkChocolatePancake(),
-                       orders.stream().filter(o -> o.getId().equals(orderId)).findFirst().get());
-        }
-    }
-
-    public void addMilkChocolateHazelnutsPancake(UUID orderId, int count) {
-        for (int i = 0; i < count; ++i) {
-            addPancake(new MilkChocolateHazelnutsPancake(),
-                       orders.stream().filter(o -> o.getId().equals(orderId)).findFirst().get());
-        }
-    }
-
     public List<String> viewOrder(UUID orderId) {
         return pancakes.stream()
                        .filter(pancake -> pancake.getOrderId().equals(orderId))
                        .map(PancakeRecipe::description).toList();
     }
 
-    private void addPancake(PancakeRecipe pancake, Order order) {
+    public void addPancakeToOrder(PancakeRecipe pancake, Order order) {
         pancake.setOrderId(order.getId());
         pancakes.add(pancake);
-
         OrderLog.logAddPancake(order, pancake.description(), pancakes);
     }
+
 
     public void removePancakes(String description, UUID orderId, int count) {
         final AtomicInteger removedCount = new AtomicInteger(0);

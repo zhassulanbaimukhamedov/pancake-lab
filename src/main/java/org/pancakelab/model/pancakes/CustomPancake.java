@@ -3,8 +3,13 @@ package org.pancakelab.model.pancakes;
 import java.util.List;
 import java.util.UUID;
 
-public class MilkChocolateHazelnutsPancake extends MilkChocolatePancake {
+public class CustomPancake implements PancakeRecipe {
+    private final List<Ingredient> ingredients;
     private UUID orderId;
+
+    public CustomPancake(List<Ingredient> ingredients) {
+        this.ingredients = ingredients;
+    }
 
     @Override
     public UUID getOrderId() {
@@ -18,6 +23,8 @@ public class MilkChocolateHazelnutsPancake extends MilkChocolatePancake {
 
     @Override
     public List<String> ingredients() {
-        return List.of("milk chocolate", "hazelnuts");
+        return ingredients.stream()
+                .map(i -> i.name().toLowerCase().replace('_', ' '))
+                .toList();
     }
 }
