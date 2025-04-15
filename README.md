@@ -37,3 +37,55 @@ The Sensei has put forth some conditions:
 
 
 Start now your assignment and save the Dojo.
+
+
+---
+
+## Implementation summary
+
+This project meets the main requirements from the assignment:
+
+- Uses only Java without any external libraries
+- Built using object-oriented programming (interfaces, classes, methods)
+- Tested with unit tests using JUnit 5
+- Uses the Builder design pattern to create pancakes with different ingredients
+- Includes validation (for example, building number must be > 0)
+- Handles multithreading safely with synchronized collections and methods
+
+---
+
+## Project structure
+
+- `PancakeService` – main logic: create orders, prepare, deliver, cancel
+- `PancakeRecipe` – interface for all types of pancakes
+- `PancakeBuilder` – helps build custom pancakes with ingredients
+- `Ingredient` – list of available ingredients
+- `Order` – represents an order from a user
+- `OrderLog` – logs important actions
+- `PancakeServiceTest` – tests for each function in the service
+
+---
+
+## How to run
+
+1. Clone this repository
+2. Open it in IntelliJ IDEA or another Java IDE
+3. Run `Main.java` to test manually
+4. Run `PancakeServiceTest.java` to check tests
+
+---
+
+## Example usage
+
+```java
+Order order = service.createOrder(3, 101);
+
+PancakeRecipe pancake = new PancakeBuilder()
+    .withMilkChocolate()
+    .withWhippedCream()
+    .build();
+
+service.addPancakeToOrder(pancake, order);
+service.completeOrder(order.getId());
+service.prepareOrder(order.getId());
+service.deliverOrder(order.getId());
